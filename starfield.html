@@ -102,9 +102,10 @@ function killHorse(horse, enemy) {
 function enemySpawner() {
     if (!isGameover && !enemyAlive) {
         //TODO: switch enemies?
-        enemy.body.x = 600;
-        enemy.body.y = 200;//parseInt(Math.random() * (game.world.height - 100)) + 100;
-        enemy.body.velocity.x = -100;
+        enemy.body.x = 800;
+        enemy.body.y = parseInt(Math.random() * (game.world.height - 100));
+        enemy.body.velocity.x = -150;
+
         enemy.revive();
         enemyAlive = true;
         
@@ -172,7 +173,7 @@ function update() {
     }
 
     if (enemyAlive) {
-        if (enemy.body.x < 200) {
+        if (enemy.body.x < 0) {
             enemy.kill();
             enemyAlive = false;
         } else {
