@@ -1,0 +1,109 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+	<meta charset="UTF-8" />
+    <title>Phaser - Making your first game, part 7</title>
+	<script type="text/javascript" src="js/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+function preload() {
+
+    game.load.image('sky', 'assets/sky.png');
+    game.load.image('star', 'assets/star.png');
+
+}
+
+var layers = [];
+var cursors;
+
+function create() {
+
+    //  We're going to be using physics, so enable the Arcade Physics system
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    //  A simple background for our game
+    //game.add.sprite(0, 0, 'sky');
+
+    // The player and its settings
+    for (var layer = 1; layer < 4; layer ++) {
+        var stars = [];
+        layers.push(stars);
+        for (var i = 0; i < 100; i++) {
+            var x = parseInt(Math.random() * (game.world.width + 200));
+            var y = parseInt(Math.random() * game.world.height);
+            var star = game.add.sprite(x, y, 'star');
+            game.physics.arcade.enable(star);
+            star.body.velocity.x = - (layer * (Math.random() * 100 + 50));
+            stars.push(star);
+        }
+    }
+    
+
+    //  Our controls.
+    cursors = game.input.keyboard.createCursorKeys();
+    
+}
+
+function update() {
+    for (var layer in layers) {
+        for (var i in layers[layer]) {
+            var star = layers[layer][i];
+            if (star.body.x < -100) {
+                star.body.x = 900;
+            }
+        }
+    }
+    // for (var i in stars) {
+    //     var star = stars[i];
+    //     star.body.velocity.x = -1;
+    // }
+
+    //  Collide the player and the stars with the platforms
+    //game.physics.arcade.collide(player, platforms);
+
+    //  Reset the players velocity (movement)
+    //player.body.velocity.x = 0;
+
+    if (cursors.left.isDown)
+    {
+        //  Move to the left
+        //player.body.velocity.x = -150;
+
+        //player.animations.play('left');
+    }
+    else if (cursors.right.isDown)
+    {
+        //  Move to the right
+        //player.body.velocity.x = 150;
+
+        //player.animations.play('right');
+    }
+    else
+    {
+        //  Stand still
+        //player.animations.stop();
+
+        //player.frame = 4;
+    }
+    
+    //  Allow the player to jump if they are touching the ground.
+    if (cursors.up.isDown && player.body.touching.down)
+    {
+        //player.body.velocity.y = -350;
+    }
+
+}
+</script>
+
+</body>
+</html>
