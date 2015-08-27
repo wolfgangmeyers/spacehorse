@@ -1,2 +1,4 @@
 # spacehorse
-Hack the Dot
+Hack the Dot project
+
+spacehorse.ninja
