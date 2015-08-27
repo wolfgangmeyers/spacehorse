@@ -1,9 +1,9 @@
 <!doctype html> 
 <html lang="en"> 
 <head> 
-	<meta charset="UTF-8" />
+    <meta charset="UTF-8" />
     <title>Phaser - Making your first game, part 7</title>
-	<script type="text/javascript" src="js/phaser.min.js"></script>
+    <script type="text/javascript" src="js/phaser.min.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -18,13 +18,26 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 
 function preload() {
 
-    game.load.image('sky', 'assets/sky.png');
+    game.load.image('horse', 'assets/horse.png');
     game.load.image('star', 'assets/star.png');
+    game.load.image('shuriken', 'assets/shuriken.png');
+    game.load.image('beatle', 'assets/beatle.png');
+    game.load.image('gameover', 'assets/gameover.png');
 
 }
 
+var horse;
 var layers = [];
 var cursors;
+var spacebar;
+var shuriken;
+var gameover;
+var isGameover = false;
+var shurikenAlive = false;
+var enemyAlive = false;
+
+var enemy;
+var beatle;
 
 function create() {
 
@@ -47,11 +60,55 @@ function create() {
             stars.push(star);
         }
     }
+    horse = game.add.sprite(50, game.world.height - 500, "horse");
+    game.physics.enable(horse);
+    shuriken = game.add.sprite(0, 0, "shuriken");
+    game.physics.enable(shuriken);
+    shuriken.kill();
     
 
     //  Our controls.
     cursors = game.input.keyboard.createCursorKeys();
+    spacebar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+    beatle = game.add.sprite(600, game.world.height - 500, "beatle");
+    game.physics.enable(beatle);
+    enemy = beatle;
+    enemy.kill();
+    enemyAlive = false;
+
+    gameover = game.add.sprite(100, 150, "gameover");
+    gameover.kill();
+
     
+}
+
+function killEnemy(shuriken, enemy) {
+    shuriken.kill();
+    shurikenAlive = false;
+    enemy.body.velocity.x = 0;
+    enemy.kill();
+    enemyAlive = false;
+}
+
+function killHorse(horse, enemy) {
+    horse.kill();
+    enemy.kill();
+    enemyAlive = false;
+    gameover.revive();
+    isGameover = true;
+}
+
+function enemySpawner() {
+    if (!isGameover && !enemyAlive) {
+        //TODO: switch enemies?
+        enemy.body.x = 600;
+        enemy.body.y = 200;//parseInt(Math.random() * (game.world.height - 100)) + 100;
+        enemy.body.velocity.x = -100;
+        enemy.revive();
+        enemyAlive = true;
+        
+    }
 }
 
 function update() {
@@ -63,20 +120,15 @@ function update() {
             }
         }
     }
-    // for (var i in stars) {
-    //     var star = stars[i];
-    //     star.body.velocity.x = -1;
-    // }
-
-    //  Collide the player and the stars with the platforms
-    //game.physics.arcade.collide(player, platforms);
 
     //  Reset the players velocity (movement)
-    //player.body.velocity.x = 0;
+    horse.body.velocity.x = 0;
+    horse.body.velocity.y = 0;
 
     if (cursors.left.isDown)
     {
         //  Move to the left
+        horse.body.velocity.x = -200;
         //player.body.velocity.x = -150;
 
         //player.animations.play('left');
@@ -85,8 +137,13 @@ function update() {
     {
         //  Move to the right
         //player.body.velocity.x = 150;
-
+        horse.body.velocity.x = 200;
         //player.animations.play('right');
+    }
+    else if (cursors.up.isDown) {
+        horse.body.velocity.y = -200;
+    } else if (cursors.down.isDown) {
+        horse.body.velocity.y = 200;
     }
     else
     {
@@ -97,11 +154,32 @@ function update() {
     }
     
     //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown && player.body.touching.down)
+    if (spacebar.isDown)
     {
-        //player.body.velocity.y = -350;
+        shuriken.body.x = horse.body.x + 100;
+        shuriken.body.y = horse.body.y;
+        shuriken.body.velocity.x = 800;
+        shuriken.revive();
+        shurikenAlive = true;
+    }
+    if (shuriken.body.x > 1000) {
+        shuriken.kill();
+        shurikenAlive = false;
     }
 
+    if (shurikenAlive) {
+        game.physics.arcade.overlap(shuriken, enemy, killEnemy, null, this);
+    }
+
+    if (enemyAlive) {
+        if (enemy.body.x < 200) {
+            enemy.kill();
+            enemyAlive = false;
+        } else {
+            game.physics.arcade.overlap(horse, enemy, killHorse, null, this);
+        }
+    }
+    enemySpawner();
 }
 </script>
 
